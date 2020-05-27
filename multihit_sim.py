@@ -27,7 +27,7 @@ sum_parmut_CD  = [0]*niter
 
 for n in range(niter):
     print(n)
-    sum_hsmut_sites = [0,0]
+    sum_hsmut_sites = [0,0] # [HO,CD]
     sum_hsmut_genes = [0,0]
     sum_parmut = [0,0]
     for i,type in enumerate([HO_nonsyn, CD_nonsyn]):
@@ -62,17 +62,17 @@ for n in range(niter):
     sum_parmut_HO[n]  = sum_parmut[0]
     sum_parmut_CD[n]  = sum_parmut[1]
 
-with open('sum_hsmut_sites%s.csv' % suffix, 'w') as f:
+with open('OUTPUT/hsmut_sites%s.csv' % suffix, 'w') as f:
     f.write("HO,CD\n")
     for n in range(niter):
         f.write("%d,%d\n" % (sum_hsmut_sites_HO[n],sum_hsmut_sites_CD[n]))
 
-with open('sum_hsmut_genes%s.csv' % suffix, 'w') as f:
+with open('OUTPUT/hsmut_genes%s.csv' % suffix, 'w') as f:
     f.write("HO,CD\n")
     for n in range(niter):
         f.write("%d,%d\n" % (sum_hsmut_genes_HO[n],sum_hsmut_genes_CD[n]))
 
-with open('sum_parmut%s.csv' % suffix, 'w') as f:
+with open('OUTPUT/parmut%s.csv' % suffix, 'w') as f:
     f.write("HO,CD\n")
     for n in range(niter):
         f.write("%d,%d\n" % (sum_parmut_HO[n],sum_parmut_CD[n]))

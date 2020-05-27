@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 SUFFIX = ['_5strains', '_50strains']
 EC = ['black', 'blue']
@@ -11,8 +12,12 @@ def make_plots(SUFFIX,EC,FC,LW,LABEL):
     
     for suffix,ec,fc,lw,label in zip(SUFFIX,EC,FC,LW,LABEL):
         
-        data_exp = np.genfromtxt('INPUT/gene_length_mut%s.csv' % suffix, 
-                             dtype=None, delimiter=',', names=True, encoding='UTF-8')
+#         data_exp = np.genfromtxt('INPUT/gene_length_mut%s.csv' % suffix, 
+#                              dtype=None, delimiter=',', names=True, encoding='UTF-8')
+        filename = os.path.join(os.path.curdir, 'INPUT', 'gene_length_mut%s.csv' % suffix)
+        data_exp = np.genfromtxt(filename, dtype=None, delimiter=',', names=True, 
+                                 encoding='UTF-8')
+        
         
         HO_mut_exp = [(d['HSmut'], d['Convergent'], d['Parallel'], d['Coincidental']) 
                   for d in data_exp if d['Orientation'] == 'HO' and d['Length'] > 200]
@@ -31,11 +36,18 @@ def make_plots(SUFFIX,EC,FC,LW,LABEL):
         
         ratio_sites_exp = sum(ho_hsmut_exp)/sum(cd_hsmut_exp)
         ratio_genes_exp = len(ho_hsmut_exp)/len(cd_hsmut_exp)
-                
-        data_sim_sites = np.genfromtxt('sum_hsmut_sites%s.csv' % suffix, 
-                            dtype=None, delimiter=',', names=True, encoding='UTF-8')
-        data_sim_genes = np.genfromtxt('sum_hsmut_genes%s.csv' % suffix, 
-                            dtype=None, delimiter=',', names=True, encoding='UTF-8')
+        
+        filename = os.path.join(os.path.curdir, 'OUTPUT', 'hsmut_sites%s.csv' % suffix)
+        data_sim_sites = np.genfromtxt(filename, dtype=None, delimiter=',', names=True, 
+                                       encoding='UTF-8')
+        filename = os.path.join(os.path.curdir, 'OUTPUT', 'hsmut_genes%s.csv' % suffix)
+        data_sim_genes = np.genfromtxt(filename, dtype=None, delimiter=',', names=True, 
+                                       encoding='UTF-8')
+        
+#         data_sim_sites = np.genfromtxt('OUTPUT/hsmut_sites%s.csv' % suffix, 
+#                             dtype=None, delimiter=',', names=True, encoding='UTF-8')
+#         data_sim_genes = np.genfromtxt('OUTPUT/hsmut_genes%s.csv' % suffix, 
+#                             dtype=None, delimiter=',', names=True, encoding='UTF-8')
         
         ho_hsmut_sites_sim = [d[0] for d in data_sim_sites]
         cd_hsmut_sites_sim = [d[1] for d in data_sim_sites]
@@ -128,8 +140,12 @@ def make_plots(SUFFIX,EC,FC,LW,LABEL):
         ratio_sites_par_exp = sum(ho_par_exp)/sum(cd_par_exp)
         ratio_genes_par_exp = len(ho_par_exp)/len(cd_par_exp)
         
-        data_sim_par = np.genfromtxt('sum_parmut%s.csv' % suffix, dtype=None, 
-                                     delimiter=',', names=True, encoding='UTF-8')
+        filename = os.path.join(os.path.curdir, 'OUTPUT', 'parmut%s.csv' % suffix)
+        data_sim_par = np.genfromtxt(filename, dtype=None, delimiter=',', names=True, 
+                                     encoding='UTF-8')
+        
+#         data_sim_par = np.genfromtxt('OUTPUT/sum_parmut%s.csv' % suffix, dtype=None, 
+#                                      delimiter=',', names=True, encoding='UTF-8')
         
         sum_par_HO = [d[0] for d in data_sim_par]
         sum_par_CD = [d[1] for d in data_sim_par]
