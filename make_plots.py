@@ -124,6 +124,7 @@ def make_plots(SUFFIX,EC,FC,LW,LABEL):
             outfile = os.path.join(os.path.curdir, 'PLOTS', 
                                    'hsmut_sites%s_%d.pdf' % (suffix,pct))
             plt.savefig(outfile, format='pdf') 
+            plt.close()
     
             plt.figure('hsmut_genes%s_%d' % (suffix,pct))
             bins = get_bins(ho_hsmut_genes_sim, cd_hsmut_genes_sim)
@@ -144,7 +145,8 @@ def make_plots(SUFFIX,EC,FC,LW,LABEL):
             
             outfile = os.path.join(os.path.curdir, 'PLOTS', 
                                    'hsmut_genes%s_%d.pdf' % (suffix,pct))
-            plt.savefig(outfile, format='pdf')   
+            plt.savefig(outfile, format='pdf')
+            plt.close()
             
             ##### PARALLEL MUTATIONS #####
             
@@ -152,24 +154,45 @@ def make_plots(SUFFIX,EC,FC,LW,LABEL):
             cd_par_exp = [x[2] for x in CD_mut_exp if x[2]>0]
             
             ratio_sites_par_exp = sum(ho_par_exp)/sum(cd_par_exp)
-            ratio_genes_par_exp = len(ho_par_exp)/len(cd_par_exp)
+#             ratio_genes_par_exp = len(ho_par_exp)/len(cd_par_exp)
             
             filename = os.path.join(os.path.curdir, 'SIM_OUTPUT', 
                                     'parmut%s_%d.csv' % (suffix,pct))
             data_sim_par = np.genfromtxt(filename, dtype=None, delimiter=',', names=True, 
                                          encoding='UTF-8')
             
-            sum_par_HO = [d[0] for d in data_sim_par]
-            sum_par_CD = [d[1] for d in data_sim_par]
+            ho_par_sim = [d[0] for d in data_sim_par]
+            cd_par_sim = [d[1] for d in data_sim_par]
+#             ratio_par_sim = [d[0]/d[1] for d in data_sim_par if d[1]>0]
+            ratio_par_sim = [None]*len(data_sim_par)
+            inf_val = 2 # bin for infinities (if # of CD parallel muts=0)
+            for i,d in enumerate(data_sim_par):
+                if d[1] > 0:
+                    ratio_par_sim[i] = d[0]/d[1]
+                else:
+                    ratio_par_sim[i] = inf_val                
+            
+            plt.figure('R_N_par_%d' % pct)
+            dx = 0.05 #0.025 #0.1
+            bins = np.arange(0, 2+dx, dx)
+            plt.hist(ratio_par_sim, bins=bins, density=False, 
+                     weights=[1/len(ratio_par_sim)]*len(ratio_par_sim), 
+                     color='white', ec=ec, fc=fc, lw=lw, label=label)
+            p_value = get_pval(ratio_par_sim, ratio_sites_par_exp)
+            plt.plot([ratio_sites_par_exp], [0.5], '*', ms=12, mec=ec, mfc=fc, 
+                     label='Observed (p = %.2f)' % p_value)
+            plt.xlabel(r'$R_{N,par}$')
+            plt.ylabel('frequency')
+            plt.legend(loc=0)
             
             plt.figure('parmut%s_%d' % (suffix,pct))
-            bins = get_bins(sum_par_HO, sum_par_CD)
-            plt.hist(sum_par_HO, bins=bins, color='white', fc='0.75', 
+            bins = get_bins(ho_par_sim, cd_par_sim)
+            plt.hist(ho_par_sim, bins=bins, color='white', fc='0.75', 
                      ec='red', lw=1, label='simulated HO')
-            plt.hist(sum_par_CD, bins=bins, color='white', fc='None', 
+            plt.hist(cd_par_sim, bins=bins, color='white', fc='None', 
                      ec='blue', lw=2, label='simulated CD')
-            p_value_ho = get_pval(sum_par_HO, sum(ho_par_exp))
-            p_value_cd = get_pval(sum_par_CD, sum(cd_par_exp))
+            p_value_ho = get_pval(ho_par_sim, sum(ho_par_exp))
+            p_value_cd = get_pval(cd_par_sim, sum(cd_par_exp))
             plt.annotate('Observed HO = {:,} (p = {:.4g})'.format(sum(ho_par_exp), p_value_ho), 
                          xy=(0.4,0.75), xycoords='axes fraction', weight='bold', color='red')
             plt.annotate('Observed CD = {:,} (p = {:.4g})'.format(sum(cd_par_exp), p_value_cd), 
@@ -181,18 +204,32 @@ def make_plots(SUFFIX,EC,FC,LW,LABEL):
             outfile = os.path.join(os.path.curdir, 'PLOTS', 
                                    'parmut%s_%d.pdf' % (suffix,pct))
             plt.savefig(outfile, format='pdf')
+            plt.close()
         
         plt.figure('R_N_%d' % pct)
         ymax = round(plt.ylim()[1]*10+0.5)/10
-        plt.ylim(ymax=ymax) #0.5
+        plt.ylim(ymax=ymax) 
         outfile = os.path.join(os.path.curdir, 'PLOTS', 'multihit_RN_%d.pdf' % pct)
         plt.savefig(outfile, format='pdf')
+        plt.close()
         
         plt.figure('R_G_%d' % pct)
         ymax = round(plt.ylim()[1]*10+0.5)/10
-        plt.ylim(ymax=ymax) #0.5
+        plt.ylim(ymax=ymax) 
         outfile = os.path.join(os.path.curdir, 'PLOTS', 'multihit_RG_%d.pdf' % pct)
         plt.savefig(outfile, format='pdf')
+        plt.close()
+        
+        plt.figure('R_N_par_%d' % pct)
+        xlim = plt.xlim()
+        locs = plt.xticks()[0]
+        labels = [str(l) for l in locs]
+        labels[-2] = 'inf'
+        plt.xticks(locs,labels)
+        plt.xlim(xlim)
+        outfile = os.path.join(os.path.curdir, 'PLOTS', 'parallel_RN_%d.pdf' % pct)
+        plt.savefig(outfile, format='pdf')
+        plt.close()
         
 #         plt.show()
     
